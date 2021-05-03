@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<form action="{{ url_for('post_qr') }}" method="post">
+    <div class="form-content">
+        <label for="qr-text">Introduce here the text you want to convert to QR Code</label>
+        <input type="text" name="qr-text" placeholder="Introduce text..." required>
+        <button type="submit">Generate</button>
+    </div>
+</form>
+
+{% endblock %}

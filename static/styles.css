@@ -1,0 +1,50 @@
+body {
+    background-image: url('cool-background.svg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: #1d2f7f;
+    font-family: Arial, sans-serif;
+}
+@media (max-width: 950px) {
+    body {
+        background-image: url('cool-background-mobile.jpeg');
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-color: #1d2f7f;
+        font-family: Arial, sans-serif;
+    }
+}
+.section {
+    display: flex;
+    justify-content: center;
+}
+.form-content {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: 2rem;
+}
+input, label, button {
+    margin: 10px;
+}
+button {
+    background: #1d2f7f;
+    color: cyan;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    padding: 7px;
+    transition: 0.2s;
+    cursor: pointer;
+}
+button:hover {
+    transform: scale(1.1);
+    background: #403a89;
+}
+input {
+    height: 2rem;
+    width: 17rem;
+}
+label {
+    text-align: center;
+}

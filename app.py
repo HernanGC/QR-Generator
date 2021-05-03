@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 from flask import redirect, url_for
 
 from PIL import Image
@@ -11,6 +11,30 @@ import qrcode
 app = Flask(__name__)
 
 
+@app.route('/', methods=['GET'])
+def index():
+    if request.method != 'GET':
+        return 'Error'
+    return render_template('index.html', name='something')
+
+
+@app.route('/generate', methods=['POST'])
+def post_qr():
+    if request.method != 'POST':
+        return 'Error'
+    if request.form['qr-text']:
+        try:
+            img = qrcode.make(request.form['qr-text'])
+            img_io = io.BytesIO()
+            img.save(img_io, format='PNG', quality=100)
+            img = img_io.decode('utf-8')
+            return render_template('code.html', img=img_io)
+        except Exception as Ex:
+            print(f'[PythonError en linea: {currentframe().f_lineno}] - [{type(Ex)}-ErrorMessage: {Ex}] - [ErrorArgs: {Ex.args}]')
+            return 'Error'
+
+
+# API
 @app.route('/qr/api/v1/post', methods=['POST'])
 def main():
     try:
