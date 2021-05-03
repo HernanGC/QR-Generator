@@ -1,5 +1,5 @@
 # QR-Generator
-Simple Python API that generates QR codes from text input
+Simple Python program with an integrated API that generates svg QR codes from text input.
 
 ## How to run the service
 
