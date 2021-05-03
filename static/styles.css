@@ -44,7 +44,19 @@ button:hover {
 input {
     height: 2rem;
     width: 17rem;
+    border-radius: 4px;
+    border: 2px solid #d5a9aa;
 }
 label {
     text-align: center;
+}
+a {
+    text-decoration: none;
+    color: #1d2f7f;
+}
+a:active {
+    color: #6a5a92;
+}
+p > a:hover {
+    color: #fff;
 }

@@ -1,83 +1,92 @@
 from flask import Flask, request, render_template
 from flask import redirect, url_for
 
-from PIL import Image
 from inspect import currentframe
 
+import os
 import io
 import simplejson as json
 import qrcode
+import qrcode.image.svg
 
 app = Flask(__name__)
+
+ERROR_MESSAGE = json.dumps({
+    'status': 'failed',
+    'message': 'There has been an error processing your request'
+})
 
 
 @app.route('/', methods=['GET'])
 def index():
     if request.method != 'GET':
-        return 'Error'
-    return render_template('index.html', name='something')
+        return redirect(url_for('error_router'))
+    return render_template('index.html')
 
 
 @app.route('/generate', methods=['POST'])
 def post_qr():
     if request.method != 'POST':
-        return 'Error'
+        return redirect(url_for('error_router'))
     if request.form['qr-text']:
         try:
-            img = qrcode.make(request.form['qr-text'])
+            code_path = 'static/qr-image.svg'
+            if os.path.exists(code_path):
+                os.remove(code_path)
+            factory = qrcode.image.svg.SvgImage
+            img = qrcode.make(request.form['qr-text'], image_factory=factory, box_size=20)
             img_io = io.BytesIO()
-            img.save(img_io, format='PNG', quality=100)
-            img = img_io.decode('utf-8')
-            return render_template('code.html', img=img_io)
+            img.save(img_io)
+            img = img_io.getvalue().decode()
+            if not os.path.exists(code_path):
+                with open(code_path, 'x') as img_file:
+                    img_file.write(img)
+            return render_template('code.html', img=code_path)
         except Exception as Ex:
-            print(f'[PythonError en linea: {currentframe().f_lineno}] - [{type(Ex)}-ErrorMessage: {Ex}] - [ErrorArgs: {Ex.args}]')
-            return 'Error'
+            print(
+                f'[PythonError en linea: {currentframe().f_lineno}] - [{type(Ex)}-ErrorMessage: {Ex}] - [ErrorArgs: {Ex.args}]')
+            return redirect(url_for('error_router'))
+    return redirect(url_for('error_router'))
+
+
+@app.route('/error', methods=['GET', 'POST'])
+def error_router(content='Sorry, there has been an error processing your request. Please, try again later.'):
+    return render_template('4xx_error.html', message=content)
 
 
 # API
 @app.route('/qr/api/v1/post', methods=['POST'])
 def main():
     try:
-        if request.method == 'POST' and request.args.get('text'):
+        if request.method == 'POST' and request.args.get('qr-text'):
             try:
-                img = qrcode.make(request.args.get('text'))
+                factory = qrcode.image.svg.SvgImage
+                img = qrcode.make(request.args.get('qr-text'), image_factory=factory, box_size=20)
                 try:
-                    img_byte_array = io.BytesIO()
-                    img.save(img_byte_array, format='JPEG')
-                    img_byte_array = img_byte_array.getvalue()
+                    img_io = io.BytesIO()
+                    img.save(img_io)
+                    img = img_io.getvalue().decode()
                 except Exception as PythonError:
-                    print(f'[PythonError en linea: {currentframe().f_lineno}] - [{type(PythonError)}-ErrorMessage: {PythonError}] - [ErrorArgs: {PythonError.args}]')
-                    img_byte_array = img 
+                    print(
+                        f'[PythonError en linea: {currentframe().f_lineno}] - [{type(PythonError)}-ErrorMessage: {PythonError}] - [ErrorArgs: {PythonError.args}]')
+                    img = 'Failed'
             except Exception as PythonError:
-                print(f'[PythonError en linea: {currentframe().f_lineno}] - [{type(PythonError)}-ErrorMessage: {PythonError}] - [ErrorArgs: {PythonError.args}]')
-                return json.dumps({
-                    'status': 'failed',
-                    'message': 'There has been an error processing your request'
-                    })
+                print(
+                    f'[PythonError en linea: {currentframe().f_lineno}] - [{type(PythonError)}-ErrorMessage: {PythonError}] - [ErrorArgs: {PythonError.args}]')
+                return ERROR_MESSAGE
         else:
             print(f'PythonError en linea: {currentframe().f_lineno}')
             return json.dumps({
                 'status': 'failed',
-                'message': 'Sorry, you must provide the "text" parameter in order to process the request'
-                })
+                'message': 'Sorry, you must provide the "qr-text" parameter in order to process the request'
+            })
         return json.dumps({
             'status': 'success',
             'message': 'Your request has been processed successfully',
-            # TODO: Arreglar este return, no me deja encodear a utf-8
-            'image': img_byte_array
-            })
+            'format': 'svg',
+            'image': img
+        })
     except Exception as PythonError:
-        print(f'[PythonError en linea: {currentframe().f_lineno}] - [{type(PythonError)}-ErrorMessage: {PythonError}] - [ErrorArgs: {PythonError.args}]')
-        return json.dumps({
-            'status': 'failed',
-            'message': 'There has been an error processing your request'
-            })
-
-
-@app.route('/')
-def base():
-    return 'Sorry, the url you are requesting is not available'
-
-@app.route('/qr')
-def redirect_urls():
-    return redirect(url_for('base'))
+        print(
+            f'[PythonError en linea: {currentframe().f_lineno}] - [{type(PythonError)}-ErrorMessage: {PythonError}] - [ErrorArgs: {PythonError.args}]')
+        return ERROR_MESSAGE

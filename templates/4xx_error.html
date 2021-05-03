@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="form-content">
-    <p>Your QR Code:</p>
-    <img src="{{ img }}" alt="Image did not load properly">
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
     <a href="{{ url_for('index') }}"><button>Go back</button></a>
 </div>
-
 {% endblock %}
