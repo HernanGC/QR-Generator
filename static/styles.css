@@ -2,7 +2,7 @@ body {
     background-image: url('cool-background.svg');
     background-repeat: no-repeat;
     background-size: cover;
-    background-color: #1d2f7f;
+    background-color: #151a80;
     font-family: Arial, sans-serif;
 }
 @media (max-width: 950px) {
