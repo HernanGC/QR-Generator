@@ -2,6 +2,7 @@ from flask import Flask, request, render_template
 from flask import redirect, url_for
 
 from inspect import currentframe
+from random import randrange
 
 import os
 import io
@@ -41,7 +42,8 @@ def post_qr():
             if not os.path.exists(code_path):
                 with open(code_path, 'x') as img_file:
                     img_file.write(img)
-            return render_template('code.html', img=code_path)
+            rand = randrange(40)
+            return render_template('code.html', img=f'{code_path}?{rand}')
         except Exception as Ex:
             print(
                 f'[PythonError en linea: {currentframe().f_lineno}] - [{type(Ex)}-ErrorMessage: {Ex}] - [ErrorArgs: {Ex.args}]')
