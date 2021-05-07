@@ -42,7 +42,7 @@ def post_qr():
             if not os.path.exists(code_path):
                 with open(code_path, 'x') as img_file:
                     img_file.write(img)
-            rand = randrange(40)
+            rand = randrange(99)
             return render_template('code.html', img=f'{code_path}?{rand}')
         except Exception as Ex:
             print(
