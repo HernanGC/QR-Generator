@@ -1,5 +1,7 @@
 # QR-Generator
 Simple Python program with an integrated API that generates svg QR codes from text input.
+You can checkout the deployed app at:
+https://hg-qr-generator.herokuapp.com/
 
 ## How to run the service
 
